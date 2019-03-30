@@ -14,11 +14,11 @@
 #include <QLabel>
 #include <QGraphicsScene>
 #include <QPushButton>
-#include <qenhancedgraphicsview.h>
 #include <QGraphicsProxyWidget>
 #include <QFileSystemWatcher>
 #include <QPoint>
 #include <opencv2/opencv.hpp>
+#include "ImageProcess/imageprocess.h"
 
 namespace Ui {
 class MainWindow;

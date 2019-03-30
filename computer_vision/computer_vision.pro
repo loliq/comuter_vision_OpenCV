@@ -25,12 +25,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    qenhancedgraphicsview.cpp \
-    imageprocess.cpp
+    GUI/qenhancedgraphicsview.cpp \
+    ImageProcess/imageprocess.cpp \
+    ImageProcess/cvregion.cpp
 
 HEADERS  += mainwindow.h \
-    qenhancedgraphicsview.h \
-    imageprocess.h
+    ImageProcess/imageprocess.h \
+    ImageProcess/cvregion.h \
+    GUI/qenhancedgraphicsview.h
 
 FORMS    += mainwindow.ui
 
