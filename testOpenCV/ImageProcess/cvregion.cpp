@@ -59,15 +59,12 @@ void connection(Mat& binaryImg, std::vector<Region>& out_regions)
         regions.clear();  //clear 擦除元素，如果元素是指针，那么指向的那块内存会不可访问
         Mat labels, stats, centroids;
         int nccomps = connectedComponentsWithStats(binaryImg, labels, stats, centroids);
-        std::vector<Mat> region_mats;
-        //不能用std::vector<Mat> region_mats(n, Mat::zeros(binaryImg.size(), CV_8U);
-        //因为这样的话全部会初始化成为同一个对象
-        for(int i=0; i < nccomps-1; ++i)
-        {
-            Mat tmp_img = Mat::zeros(binaryImg.size(), CV_8U);
-            region_mats.push_back(tmp_img);
-        }
-        //label 0 为背景标签
+        std::vector<std::vector<Point>> vec_vecOfPoint(nccomps-1); //初始化nccomps-1个点集
+
+        //使用std::vector<Mat> region_mats;的话临时内存损耗太大了，会卡主
+//        //不能用std::vector<Mat> region_mats(n, Mat::zeros(binaryImg.size(), CV_8U);
+//        //因为这样的话全部会初始化成为同一个对象
+//        //label 0 为背景标签
         for(int row_i = 0 ; row_i< binaryImg.rows; ++row_i)
         {
             for(int col_j = 0; col_j < binaryImg.cols; ++col_j)
@@ -76,7 +73,7 @@ void connection(Mat& binaryImg, std::vector<Region>& out_regions)
                 CV_Assert(0 <= label && label <= nccomps);
                 if(label) //label为0的时候为背景
                 {
-                    region_mats[label-1].at<uchar>(row_i, col_j) = 255; //将标记区域的灰度设置为1
+                    vec_vecOfPoint[label-1].push_back(cv::Point(col_j, row_i));//存入点集合
                 }
 
             }
@@ -90,7 +87,14 @@ void connection(Mat& binaryImg, std::vector<Region>& out_regions)
             int area = stats.at<int>(i, cv::CC_STAT_AREA);
             Rect box = Rect(cord_x, cord_y, width, height);
             Point2f center_point = Point2d(centroids.at<int>(i, 0), centroids.at<int>(i, 1));
-            Region tm_region(region_mats[i-1], box, center_point, area);
+            Mat tmp_img = Mat::zeros(binaryImg.size(), CV_8U);
+            for(Point &p : vec_vecOfPoint[i-1])
+            {
+                tmp_img.at<uchar>(p.y, p.x) = 255;
+            }
+            imshow("region", tmp_img);
+            waitKey(-1);
+            Region tm_region(tmp_img, box, center_point, area);
             regions.push_back(tm_region);
         }
         out_regions = regions;
@@ -330,4 +334,81 @@ void select_region_shape(vector<Region> &regions, RegionFeature feature,
 
 }
 
+void frequence_blur()
+{
+    Mat input=imread("/home/lilanluo/image.bmp", 0);
+
+    imshow("input",input);
+    int w=getOptimalDFTSize(input.cols);
+    int h=getOptimalDFTSize(input.rows);
+    Mat padded;
+    copyMakeBorder(input,padded,0,h-input.rows,0,w-input.cols,BORDER_CONSTANT,Scalar::all(0));
+    padded.convertTo(padded,CV_32FC1);
+    imshow("padded",padded);
+    for(int i=0;i<padded.rows;i++)//中心化操作，其余操作和上一篇博客的介绍一样
+    {
+        float *ptr=padded.ptr<float>(i);
+        for(int j=0;j<padded.cols;j++)	ptr[j]*=pow(-1,i+j);
+    }
+    Mat plane[]={padded,Mat::zeros(padded.size(),CV_32F)};
+    Mat complexImg;
+    merge(plane,2,complexImg);
+    dft(complexImg,complexImg);
+//************************gaussian****************************
+    Mat gaussianBlur(padded.size(),CV_32FC2);
+    Mat gaussianSharpen(padded.size(),CV_32FC2);
+    float D0=2*10*10;
+    for(int i=0;i<padded.rows;i++)
+    {
+        float*p=gaussianBlur.ptr<float>(i);
+        float*q=gaussianSharpen.ptr<float>(i);
+        for(int j=0;j<padded.cols;j++)
+        {
+            float d=pow(i-padded.rows/2,2)+pow(j-padded.cols/2,2);
+            p[2*j]=expf(-d/D0);
+            p[2*j+1]=expf(-d/D0);
+
+            q[2*j]=1-expf(-d/D0);
+            q[2*j+1]=1-expf(-d/D0);
+        }
+    }
+    multiply(complexImg,gaussianBlur,gaussianBlur);//矩阵元素对应相乘法，注意，和矩阵相乘区分
+    multiply(complexImg,gaussianSharpen,gaussianSharpen);
+//*****************************************************************
+    split(complexImg,plane);
+    magnitude(plane[0],plane[1],plane[0]);
+    plane[0]+=Scalar::all(1);
+    log(plane[0],plane[0]);
+    normalize(plane[0],plane[0],1,0,CV_MINMAX);
+    imshow("dft",plane[0]);
+//******************************************************************
+    split(gaussianBlur,plane);
+    magnitude(plane[0],plane[1],plane[0]);
+    plane[0]+=Scalar::all(1);
+    log(plane[0],plane[0]);
+    normalize(plane[0],plane[0],1,0,CV_MINMAX);
+    imshow("gaussianBlur",plane[0]);
+
+    split(gaussianSharpen,plane);
+    magnitude(plane[0],plane[1],plane[0]);
+    plane[0]+=Scalar::all(1);
+    log(plane[0],plane[0]);
+    normalize(plane[0],plane[0],1,0,CV_MINMAX);
+    imshow("gaussianSharpen",plane[0]);
+//******************************************************************
+//*************************idft*************************************
+    idft(gaussianBlur,gaussianBlur);
+    idft(gaussianSharpen,gaussianSharpen);
+    split(gaussianBlur,plane);
+    magnitude(plane[0],plane[1],plane[0]);
+    normalize(plane[0],plane[0],1,0,CV_MINMAX);
+    imshow("idft-gaussianBlur",plane[0]);
+
+    split(gaussianSharpen,plane);
+    magnitude(plane[0],plane[1],plane[0]);
+    normalize(plane[0],plane[0],1,0,CV_MINMAX);
+    imshow("idft-gaussianSharpen",plane[0]);
+
+    waitKey();
+}
 

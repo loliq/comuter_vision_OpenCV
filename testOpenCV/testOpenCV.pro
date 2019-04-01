@@ -1,10 +1,11 @@
 TEMPLATE = app
 CONFIG += console c++11
 CONFIG -= app_bundle
-CONFIG -= qt
+CONFIG += qt
 
 SOURCES += main.cpp \
-    cvregion.cpp
+    ImageProcess/cvregion.cpp \
+    ImageProcess/imageprocess.cpp
 
 
 INCLUDEPATH += /usr/local/include \
@@ -17,4 +18,6 @@ LIBS += /usr/local/lib/libopencv_highgui.so \
         /usr/local/lib/libopencv_imgcodecs.so
 
 HEADERS += \
-    cvregion.h
+    cvregion.h \
+    ImageProcess/cvregion.h \
+    ImageProcess/imageprocess.h
