@@ -10,15 +10,19 @@ using namespace cv;
 
 int main(int argc, char *argv[])
 {
-    Mat input = imread("/home/lilanluo/image.bmp", 0); //xuyao fangzai debugdewenjianjia
-    Mat outImg;
-    Mat gaussianKernel;
-    gen_gaussFilter(input.rows, input.cols, 301, 201, gaussianKernel);
-    Mat fftImg, flitedImg;
-    freqfilt(input, gaussianKernel, flitedImg, fftImg, 150, 200);
+    Mat input = imread("/home/lilanluo/odd.jpg", 0); //xuyao fangzai debugdewenjianjia
+    cout << "original image size " << input.size <<endl;
+    int optWidth = getOptimalDFTSize(input.cols);
+    int optHeight = getOptimalDFTSize(input.rows);
+    Mat output;
+    dftImg(input, output);
 
 
-    imshow("结果图 sigma=40",fftImg);
+    imshow("FFt", output);
     waitKey(-1);
+    cout << "FFT optimalDFT width" << optWidth << endl;
+    cout << "FFT optimalDFT Height" << optHeight <<endl;
+
     return 0;
+
 }

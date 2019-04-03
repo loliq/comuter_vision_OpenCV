@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/Image">
+        <file>icons/zoom out.png</file>
+        <file>icons/zoom-in(1).png</file>
+        <file>icons/zoom-in.png</file>
+        <file>icons/Save-Settings(1).png</file>
+        <file>icons/ios-save(1).png</file>
+        <file>icons/前进.png</file>
+        <file>icons/后退.png</file>
+        <file>icons/图像_images17.png</file>
+        <file>icons/运行中.png</file>
+    </qresource>
+</RCC>

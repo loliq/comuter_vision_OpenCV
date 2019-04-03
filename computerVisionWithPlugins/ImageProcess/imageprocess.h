@@ -42,7 +42,7 @@ extern QImage Mat2QImage(const cv::Mat& src);
  * @param channel
  * @return
  */
-extern uchar getGrayVal(const cv::Mat& img, int row, int col, int channMatel=0);
+extern uchar getGrayVal(const cv::Mat& img, int row, int col, int channel=0);
 /**
  * @brief setGrayVal
  * @param img
@@ -88,37 +88,6 @@ extern void gerRotationMat(const cv::Point2f&center, double angle, double scale,
 * return
 */
 extern void affine_trans_image(cv::Mat& srcImg, cv::Mat& outImg, const cv::Mat& HotMat2D);
-/**
- * @brief gen_gaussFilter-生成高斯频域滤波器
- * @param width -input.rows
- * @param height -input.cols
- * @param sigma1
- * @param sigma2
- * @param filter
- * @param is_reverse -选择是陷波还是滤波
- */
-extern void genGaussFilter(int width, int height, double sigma1, double sigma2,
-                     cv::Mat& filter, bool is_reverse=true);
 
-/**
- * @brief freqfilt-频率域滤波
- * @param input
- * @param blur   -滤波器图像，需要和input同样大小
- * @param idftImage -滤波器反变换结果
- * @param dftImage -频域图像
- * @param x -滤波器中心所在的x坐标      |x| < inout.cols/2
- * @param y -滤波器中心所在的位置-y坐标，|y| < input.rows/2
- */
-extern void gaussianFreqFilt(cv::Mat& input, cv::Mat& blur, cv::Mat& idftImage,
-                     cv::Mat& dftImage, double sigma1=0.5, double sigma2=0.5, int x=0, int y=0);
-/**
- * @brief Centralization -图像中心化
- * @param input
- */
-extern void Centralization(cv::Mat& input);
-/**
- * @brief replicate_coord -对图像进行关于原点对称
- * @param input
- */
-void replicate_coord(cv:: Mat& input);
+
 #endif // IMAGEPROCESS_H
