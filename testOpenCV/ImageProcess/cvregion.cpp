@@ -3,7 +3,6 @@
 
 Region::Region()
 {
-
 }
 Region::~Region()
 {
@@ -55,8 +54,8 @@ void connection(Mat& binaryImg, std::vector<Region>& out_regions)
 {
     try
     {
-        vector<Region> regions;
-        regions.clear();  //clear 擦除元素，如果元素是指针，那么指向的那块内存会不可访问
+//        vector<Region> regions;
+        out_regions.clear();  //clear 擦除元素，如果元素是指针，那么指向的那块内存会不可访问
         Mat labels, stats, centroids;
         int nccomps = connectedComponentsWithStats(binaryImg, labels, stats, centroids);
         std::vector<std::vector<Point>> vec_vecOfPoint(nccomps-1); //初始化nccomps-1个点集
@@ -73,7 +72,8 @@ void connection(Mat& binaryImg, std::vector<Region>& out_regions)
                 CV_Assert(0 <= label && label <= nccomps);
                 if(label) //label为0的时候为背景
                 {
-                    vec_vecOfPoint[label-1].push_back(cv::Point(col_j, row_i));//存入点集合
+                    cv::Point temp_Point(col_j, row_i);
+                    vec_vecOfPoint[label-1].push_back(std::move(temp_Point));//存入点集合
                 }
 
             }
@@ -92,12 +92,15 @@ void connection(Mat& binaryImg, std::vector<Region>& out_regions)
             {
                 tmp_img.at<uchar>(p.y, p.x) = 255;
             }
-            imshow("region", tmp_img);
-            waitKey(-1);
+//            imshow("region", tmp_img);
+//            waitKey(-1);
             Region tm_region(tmp_img, box, center_point, area);
-            regions.push_back(tm_region);
+            //这里将拷贝变成移动
+            out_regions.push_back(std::move(tm_region));
+//            regions.push_back(tm_region);
         }
-        out_regions = regions;
+        //=是拷贝复制
+//        out_regions = regions;
 
     }catch(cv::Exception e)
     {

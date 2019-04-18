@@ -44,8 +44,6 @@ public:
     Region();
     ~Region();
     Region(Mat& mat, const cv::Rect& box, const Point2d& center_point, const int& Area);
-    Region(const std::vector<std::pair<int, int>>& code, const cv::Rect& box,
-           const Point2d& center_point, const int& Area);
     //调用一个const对象的非const成员函数这是不允许的
     int getArea() const;
     int getWidth() const;

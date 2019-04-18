@@ -64,7 +64,7 @@ private:
     void populatePluginsMenu();
     void initUI();
     void initGraphicsSystem();
-    void init_slots();
+    void initSlots();
 private:
     QString m_currentPluginFile;
     QPointer<QPluginLoader> m_currentPlugin;

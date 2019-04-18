@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this); //ui_window.h是根据编译生成的
     populatePluginsMenu();
     initUI();
-    init_slots();
+    initSlots();
     initGraphicsSystem();
 }
 
@@ -35,7 +35,7 @@ void MainWindow::initUI()
     //
 }
 
-void MainWindow:: init_slots()
+void MainWindow:: initSlots()
 {
     QObject::connect(&m_fileWatcher, &QFileSystemWatcher::directoryChanged, this, &MainWindow::on_directoryChanged);
     QObject::connect(ui->graphicsView, SIGNAL(sigMouseMovePoint(QPoint)), this, SLOT(on_mouseMovePoint(QPoint)));
